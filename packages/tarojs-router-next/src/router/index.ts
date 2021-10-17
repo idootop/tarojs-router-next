@@ -70,13 +70,15 @@ export class Router {
           break
       }
       next()
+      return new Promise<T>(async (res, rej) => {
+        PageData.setPagePromise(route_key, { res, rej });
+      })
     })
 
-    return new Promise(async (res, rej) => {
-      PageData.setPagePromise(route_key, { res, rej })
-
-      const fn = compose(middlewares)
-      await fn(context)
+    return new Promise(async (res, _) => {
+      const fn = compose(middlewares);
+      const result = await fn(context);
+      res(result);
     })
   }
 
